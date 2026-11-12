@@ -1,10 +1,8 @@
 """Alternate app icons modeled on the IONIQ 5's Parametric Pixel lamps.
 
 Usage: python make_lamp_icon.py <out.png> --front | --rear
---front: one IONIQ 5 headlamp: a smoked-glass housing with two U-shaped
-         light guides, and the silver strip beneath it.
---rear:  the full-width black tail bar with red pixel blocks at each end,
-         lit on the diagonal.
+--front: one white headlamp, a lit square frame around a lit square core.
+--rear:  the same concentric-square lamp in red, as a tail light.
 Inspired by the lamps, simplified to a few big pixels so it reads at icon size.
 Original artwork of the lamp motif; no logos. Renders at 4x and downsamples.
 """
@@ -77,41 +75,32 @@ for radius, strength in ((90 * K, 1), (90 * K, 1), (30 * K, 1), (10 * K, 1)):
     img.alpha_composite(bloom.filter(ImageFilter.GaussianBlur(radius)))
 img.alpha_composite(pix)
 
-if not rear:
-    # Redraw: the headlamp housing and its two U-shaped light guides.
-    img = Image.fromarray(np.clip(bg, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
-    x0, x1, y0, y1 = N * 0.07, N * 0.93, N * 0.36, N * 0.60
-    housing = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    hd = ImageDraw.Draw(housing)
-    hd.rounded_rectangle([x0, y0, x1, y1], radius=40 * K, fill=(10, 12, 16, 255))
-    img.alpha_composite(housing)
-    # Glass sheen along the top of the housing.
-    sheen = np.zeros((N, N, 4), np.uint8)
-    sheen[int(y0 + 8 * K):int(y0 + 13 * K), int(x0 + 40 * K):int(x1 - 40 * K)] = (255, 255, 255, 34)
-    img.alpha_composite(Image.fromarray(sheen, "RGBA"))
-    # Two U-shaped light guides (open at the top), side by side.
-    stroke = 30 * K
-    lights = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    ld = ImageDraw.Draw(lights)
-    gap = 56 * K
-    width = (x1 - x0 - 2 * 60 * K - gap) / 2
-    top, bottom = y0 + 58 * K, y1 - 52 * K
-    for i in range(2):
-        left = x0 + 60 * K + i * (width + gap)
-        right = left + width
-        ld.rectangle([left, top, left + stroke, bottom], fill=(236, 244, 255, 255))
-        ld.rectangle([right - stroke, top, right, bottom], fill=(236, 244, 255, 255))
-        ld.rectangle([left, bottom - stroke, right, bottom], fill=(236, 244, 255, 255))
-    glow_layer = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    glow_layer.paste((150, 190, 255, 255), mask=lights.getchannel("A"))
-    for radius in (80 * K, 30 * K, 10 * K):
-        img.alpha_composite(glow_layer.filter(ImageFilter.GaussianBlur(radius)))
-    img.alpha_composite(lights)
-    # Silver light strip below the lamp.
-    strip = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    sd = ImageDraw.Draw(strip)
-    sd.rounded_rectangle([x0 + 10 * K, y1 + 30 * K, x1 - 10 * K, y1 + 48 * K], radius=9 * K, fill=(200, 206, 214, 220))
-    img.alpha_composite(strip)
+# One lamp, drawn as the car's concentric-square pixel lamp: a lit square
+# frame around a lit square core, in a smoked-glass housing.
+img = Image.fromarray(np.clip(bg, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+x0, x1, y0, y1 = N * 0.08, N * 0.92, N * 0.27, N * 0.73
+housing = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+ImageDraw.Draw(housing).rounded_rectangle([x0, y0, x1, y1], radius=56 * K, fill=(10, 11, 14, 255))
+img.alpha_composite(housing)
+sheen = np.zeros((N, N, 4), np.uint8)
+sheen[int(y0 + 10 * K):int(y0 + 15 * K), int(x0 + 56 * K):int(x1 - 56 * K)] = (255, 255, 255, 30)
+img.alpha_composite(Image.fromarray(sheen, "RGBA"))
+
+color = (255, 52, 44) if rear else (236, 244, 255)
+cx, cy = N / 2, (y0 + y1) / 2
+outer, ring = 170 * K, 30 * K          # half-size of the frame, frame thickness
+core = 72 * K                           # half-size of the inner square
+lights = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+ld = ImageDraw.Draw(lights)
+ld.rounded_rectangle([cx - outer, cy - outer, cx + outer, cy + outer], radius=22 * K, fill=(*color, 255))
+ld.rounded_rectangle([cx - outer + ring, cy - outer + ring, cx + outer - ring, cy + outer - ring],
+                     radius=10 * K, fill=(0, 0, 0, 0))
+ld.rounded_rectangle([cx - core, cy - core, cx + core, cy + core], radius=12 * K, fill=(*color, 255))
+glow_layer = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+glow_layer.paste((*glow, 255), mask=lights.getchannel("A"))
+for radius in (90 * K, 34 * K, 10 * K):
+    img.alpha_composite(glow_layer.filter(ImageFilter.GaussianBlur(radius)))
+img.alpha_composite(lights)
 
 img.resize((S, S), Image.LANCZOS).convert("RGB").save(out)
 print("wrote", out)

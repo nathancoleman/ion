@@ -26,30 +26,40 @@ enum AccentOption: String, CaseIterable, Identifiable {
 /// Primary color for the Ion theme. `bright` is used in dark mode and for the
 /// icon; `deep` is the same hue darkened so it reads on white in light mode.
 enum IonColor: String, CaseIterable, Identifiable {
-    case violet, blue, teal, green, amber, red, pink
+    case violet, amber, orange, pink, blueViolet, azure
     var id: String { rawValue }
-    var name: String { rawValue.capitalized }
+    var name: String {
+        switch self {
+        case .violet: "Ion"
+        case .amber: "Amber Gold"
+        case .orange: "Blaze Orange"
+        case .pink: "Neon Pink"
+        case .blueViolet: "Blue Violet"
+        case .azure: "Azure Blue"
+        }
+    }
 
+    /// Dark mode and the icon. Amber Gold through Azure Blue are the
+    /// "Vibrant Color Fiesta" palette (#FFBE0B #FB5607 #FF006E #8338EC #3A86FF).
     var bright: (Double, Double, Double) {
         switch self {
         case .violet: (0.66, 0.52, 1.00)
-        case .blue: (0.40, 0.62, 1.00)
-        case .teal: (0.30, 0.82, 0.80)
-        case .green: (0.42, 0.85, 0.50)
-        case .amber: (1.00, 0.72, 0.30)
-        case .red: (1.00, 0.45, 0.42)
-        case .pink: (1.00, 0.50, 0.78)
+        case .amber: (1.00, 0.745, 0.043)
+        case .orange: (0.984, 0.337, 0.027)
+        case .pink: (1.00, 0.00, 0.431)
+        case .blueViolet: (0.514, 0.220, 0.925)
+        case .azure: (0.227, 0.525, 1.00)
         }
     }
+    /// Light mode: the same hue, dark enough to read on white.
     var deep: (Double, Double, Double) {
         switch self {
         case .violet: (0.48, 0.33, 0.90)
-        case .blue: (0.15, 0.42, 0.92)
-        case .teal: (0.00, 0.55, 0.56)
-        case .green: (0.13, 0.58, 0.27)
-        case .amber: (0.80, 0.48, 0.00)
-        case .red: (0.84, 0.20, 0.20)
-        case .pink: (0.85, 0.22, 0.55)
+        case .amber: (0.78, 0.53, 0.00)
+        case .orange: (0.86, 0.29, 0.00)
+        case .pink: (0.86, 0.00, 0.37)
+        case .blueViolet: (0.47, 0.19, 0.88)
+        case .azure: (0.13, 0.43, 0.92)
         }
     }
     var color: Color {
@@ -57,7 +67,7 @@ enum IonColor: String, CaseIterable, Identifiable {
                       dark: UIColor(red: bright.0, green: bright.1, blue: bright.2, alpha: 1))
     }
     /// Matching home screen icon (nil = the primary, violet icon).
-    var iconName: String? { self == .violet ? nil : "AppIcon-Ion-\(rawValue.capitalized)" }
+    var iconName: String? { self == .violet ? nil : "AppIcon-Ion-\(rawValue.prefix(1).uppercased() + rawValue.dropFirst())" }
 }
 
 /// Alternate home screen icons that don't depend on the theme.

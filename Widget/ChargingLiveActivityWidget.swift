@@ -19,10 +19,10 @@ struct ChargingLiveActivityWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     if state.phase == .charging {
-                        Text(timerInterval: Date.now...max(state.readyAt, .now), countsDown: true)
-                            .font(.title2.monospacedDigit())
+                        // Hours and minutes only; seconds aren't useful for a charge.
+                        Text(.currentDate, format: .reference(to: state.readyAt, allowedFields: [.hour, .minute], maxFieldCount: 2))
+                            .font(.headline)
                             .multilineTextAlignment(.trailing)
-                            .frame(width: 84)
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
@@ -123,8 +123,7 @@ struct ChargingProgress: View {
             .frame(height: 6)
             HStack {
                 if state.phase == .charging {
-                    Text("\(state.limit)% in \(Text(timerInterval: Date.now...max(state.readyAt, .now), countsDown: true))")
-                        .monospacedDigit()
+                    Text("\(state.limit)% \(Text(.currentDate, format: .reference(to: state.readyAt, allowedFields: [.hour, .minute], maxFieldCount: 2)))")
                 } else {
                     Text("Limit \(state.limit)%")
                 }
