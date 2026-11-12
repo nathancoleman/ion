@@ -332,16 +332,6 @@ struct ChargeHero: View {
                                     .position(center)
                                     .blendMode(.screen)
                             }
-                            HStack(spacing: 4) {
-                                Image(systemName: charging ? "bolt.fill" : plugged ? "powerplug.portrait.fill" : "battery.75percent")
-                                    .foregroundStyle(plugged ? glow : .secondary)
-                                Text("\(Int(percent))%").monospacedDigit()
-                            }
-                            .font(.subheadline.weight(.bold))
-                            .padding(.horizontal, 10).padding(.vertical, 6)
-                            .background(.ultraThinMaterial, in: Capsule())
-                            .overlay(Capsule().stroke(Theme.hairline))
-                            .position(x: center.x - 70, y: center.y - 30)
                         }
                     }
                     .padding(.horizontal, 24)
@@ -351,7 +341,7 @@ struct ChargeHero: View {
             }
 
             VStack(spacing: 6) {
-                Text(charging ? "Charging" : plugged ? "Plugged in" : "Not plugged in")
+                Text("\(charging ? "Charging" : plugged ? "Plugged in" : "Not plugged in") · \(Int(percent))%")
                     .font(.headline)
                 if charging, let ev {
                     let minutes = Int(ev.chargeTime.components.seconds / 60)

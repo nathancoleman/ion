@@ -72,7 +72,6 @@ struct PixelGridBackground: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        let accent = Theme.accentRGB
         let pastel = Theme.isPastel
         let sketch = Theme.isSketch && !pastel
         let paper = Theme.background
@@ -81,7 +80,6 @@ struct PixelGridBackground: View {
         Canvas { context, size in
             // Soft spotlight behind the car
             let center = CGPoint(x: size.width * 0.5, y: size.height * focusY)
-            let (r, g, b) = accent
             if pastel {
                 // Soft pastel washes: peach, lavender and mint, no grid.
                 context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(paper))

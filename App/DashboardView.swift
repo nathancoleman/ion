@@ -166,7 +166,6 @@ struct DashboardView: View {
                         climateOn: status?.climateStatus.airControlOn ?? false, openParts: CarPart.open(in: status))
                     .animation(.easeInOut(duration: 0.15), value: store.lightsFlashing)
                     .overlay { CarStateOverlay(status: status) }
-                    .overlay { carCallouts }
                     .padding(.horizontal, 20)   // same margins as the rear view
                     .tag(CarView.Angle.front)
                 CarView(paint: store.appearance.paint, view: .side)
@@ -200,7 +199,7 @@ struct DashboardView: View {
         }
     }
 
-    /// Charge port glow + battery tag on the rear view (port sits beside the tail light).
+    /// Charge port glow on the rear view (port sits beside the tail light).
     private var rearChargeCallout: some View {
         GeometryReader { proxy in
             if let ev = store.status?.evStatus {
@@ -214,16 +213,6 @@ struct DashboardView: View {
                         .position(port)
                         .blendMode(Theme.isSketch ? .normal : .screen)
                 }
-                HStack(spacing: 4) {
-                    Image(systemName: ev.charging ? "bolt.fill" : ev.pluggedIn ? "powerplug.portrait.fill" : "battery.75percent")
-                        .foregroundStyle(Theme.accent)
-                    Text("\(Int(ev.evRange.percentage))%").monospacedDigit()
-                }
-                .font(.caption.weight(.bold))
-                .padding(.horizontal, 9).padding(.vertical, 5)
-                .background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().stroke(Theme.hairline))
-                .position(x: port.x - 60, y: port.y - 26)
             }
         }
         .allowsHitTesting(false)
@@ -279,28 +268,6 @@ struct DashboardView: View {
             }
         }
         .surface()
-    }
-
-    /// Status tags pinned to the car (not controls): battery at the charge port.
-    private var carCallouts: some View {
-        GeometryReader { proxy in
-            if let ev = store.status?.evStatus, ev.pluggedIn {
-                HStack(spacing: 4) {
-                    Image(systemName: ev.charging ? "bolt.fill" : "powerplug.portrait.fill")
-                        .foregroundStyle(ev.charging ? Theme.accent : .secondary)
-                    Text("\(Int(ev.evRange.percentage))%").monospacedDigit()
-                }
-                .font(.caption.weight(.bold))
-                .padding(.horizontal, 9)
-                .padding(.vertical, 5)
-                .background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().stroke(Theme.hairline))
-                // Charge port sits at ~10% of the photo; keep the tag on screen
-                // since the car bleeds off the leading edge.
-                .position(x: max(proxy.size.width * 0.12, 84), y: proxy.size.height * 0.22)
-            }
-        }
-        .allowsHitTesting(false)
     }
 
     private var rangeText: String {
