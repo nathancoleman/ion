@@ -26,11 +26,12 @@ enum AccentOption: String, CaseIterable, Identifiable {
 /// Primary color for the Ion theme. `bright` is used in dark mode and for the
 /// icon; `deep` is the same hue darkened so it reads on white in light mode.
 enum IonColor: String, CaseIterable, Identifiable {
-    case violet, amber, orange, pink, blueViolet, azure
+    case amber, orange, pink, blueViolet, azure
+    /// The default, and the color of the primary app icon.
+    static let standard: IonColor = .blueViolet
     var id: String { rawValue }
     var name: String {
         switch self {
-        case .violet: "Ion"
         case .amber: "Amber Gold"
         case .orange: "Blaze Orange"
         case .pink: "Neon Pink"
@@ -39,11 +40,10 @@ enum IonColor: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Dark mode and the icon. Amber Gold through Azure Blue are the
-    /// "Vibrant Color Fiesta" palette (#FFBE0B #FB5607 #FF006E #8338EC #3A86FF).
+    /// Dark mode and the icon: the "Vibrant Color Fiesta" palette
+    /// (#FFBE0B #FB5607 #FF006E #8338EC #3A86FF).
     var bright: (Double, Double, Double) {
         switch self {
-        case .violet: (0.66, 0.52, 1.00)
         case .amber: (1.00, 0.745, 0.043)
         case .orange: (0.984, 0.337, 0.027)
         case .pink: (1.00, 0.00, 0.431)
@@ -54,7 +54,6 @@ enum IonColor: String, CaseIterable, Identifiable {
     /// Light mode: the same hue, dark enough to read on white.
     var deep: (Double, Double, Double) {
         switch self {
-        case .violet: (0.48, 0.33, 0.90)
         case .amber: (0.78, 0.53, 0.00)
         case .orange: (0.86, 0.29, 0.00)
         case .pink: (0.86, 0.00, 0.37)
@@ -67,7 +66,7 @@ enum IonColor: String, CaseIterable, Identifiable {
                       dark: UIColor(red: bright.0, green: bright.1, blue: bright.2, alpha: 1))
     }
     /// Matching home screen icon (nil = the primary, violet icon).
-    var iconName: String? { self == .violet ? nil : "AppIcon-Ion-\(rawValue.prefix(1).uppercased() + rawValue.dropFirst())" }
+    var iconName: String? { self == .standard ? nil : "AppIcon-Ion-\(rawValue.prefix(1).uppercased() + rawValue.dropFirst())" }
 }
 
 /// Alternate home screen icons that don't depend on the theme.
@@ -92,7 +91,7 @@ enum AppIconStyle: String, CaseIterable, Identifiable {
         guard self == .theme else { return "icon-preview-\(rawValue)" }
         if accent == .violet {
             let color = AppearanceSettings.shared.ionColor
-            return color == .violet ? "icon-preview-ion" : "icon-preview-ion-\(color.rawValue)"
+            return color == .standard ? "icon-preview-ion" : "icon-preview-ion-\(color.rawValue)"
         }
         return "icon-preview-\(accent.rawValue)"
     }
@@ -156,7 +155,7 @@ final class AppearanceSettings {
     private init() {
         accent = AccentOption(rawValue: UserDefaults.standard.string(forKey: "accent") ?? "") ?? .violet
         icon = AppIconStyle(rawValue: UserDefaults.standard.string(forKey: "appIcon") ?? "") ?? .theme
-        ionColor = IonColor(rawValue: UserDefaults.standard.string(forKey: "ionColor") ?? "") ?? .violet
+        ionColor = IonColor(rawValue: UserDefaults.standard.string(forKey: "ionColor") ?? "") ?? .standard
         CarView.artTheme = accent.artStyle
         syncActivityAccent()
     }
@@ -373,7 +372,7 @@ struct IonMark: View {
         HStack(spacing: size * 0.85) {
             ForEach(0..<4, id: \.self) { _ in
                 RoundedRectangle(cornerRadius: size * 0.18, style: .continuous)
-                    .fill(LinearGradient(colors: [Color(red: 0.87, green: 0.77, blue: 1), Theme.accent],
+                    .fill(LinearGradient(colors: [Theme.accent.mix(with: .white, by: 0.55), Theme.accent],
                                          startPoint: .top, endPoint: .bottom))
                     .frame(width: size, height: size)
                     .shadow(color: Theme.accent.opacity(0.8), radius: size * 0.5)

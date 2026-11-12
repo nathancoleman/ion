@@ -30,7 +30,7 @@ struct ChargingActivityAttributes: ActivityAttributes {
 enum ChargingLiveActivity {
     /// Set by the app from its theme (the lock screen is always dark, so
     /// this is the theme's bright variant).
-    static var accentRGB: [Double] = [0.66, 0.52, 1.0]
+    static var accentRGB: [Double] = [0.514, 0.220, 0.925]
 
     /// Starts, updates or ends the activity to match the latest status.
     /// Called after every status refresh (app, widget intents, background).

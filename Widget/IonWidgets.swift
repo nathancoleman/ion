@@ -172,5 +172,5 @@ struct ClimateControl: ControlWidget {
 extension Color {
     /// Ion's accent. Widgets can't read the app's theme without the App Group,
     /// so they use the default Ion violet.
-    static let ionViolet = Color(red: 0.66, green: 0.52, blue: 1.0)
+    static let ionViolet = Color(red: 0.514, green: 0.220, blue: 0.925)  // Blue Violet
 }

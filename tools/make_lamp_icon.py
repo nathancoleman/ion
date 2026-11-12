@@ -1,8 +1,9 @@
 """Alternate app icons modeled on the IONIQ 5's Parametric Pixel lamps.
 
 Usage: python make_lamp_icon.py <out.png> --front | --rear
---front: one white headlamp, a lit square frame around a lit square core.
---rear:  the same concentric-square lamp in red, as a tail light.
+--front: one headlamp: two U-shaped light guides in a smoked-glass housing,
+         with the silver strip beneath it.
+--rear:  one tail lamp: a block of red pixels lit in a stair-step pattern.
 Inspired by the lamps, simplified to a few big pixels so it reads at icon size.
 Original artwork of the lamp motif; no logos. Renders at 4x and downsamples.
 """
@@ -75,32 +76,58 @@ for radius, strength in ((90 * K, 1), (90 * K, 1), (30 * K, 1), (10 * K, 1)):
     img.alpha_composite(bloom.filter(ImageFilter.GaussianBlur(radius)))
 img.alpha_composite(pix)
 
-# One lamp, drawn as the car's concentric-square pixel lamp: a lit square
-# frame around a lit square core, in a smoked-glass housing.
+# One lamp in a smoked-glass housing.
 img = Image.fromarray(np.clip(bg, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
-x0, x1, y0, y1 = N * 0.08, N * 0.92, N * 0.27, N * 0.73
+x0, x1 = N * 0.07, N * 0.93
+y0, y1 = (N * 0.30, N * 0.70) if rear else (N * 0.36, N * 0.60)
 housing = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-ImageDraw.Draw(housing).rounded_rectangle([x0, y0, x1, y1], radius=56 * K, fill=(10, 11, 14, 255))
+ImageDraw.Draw(housing).rounded_rectangle([x0, y0, x1, y1], radius=44 * K, fill=(10, 11, 14, 255))
 img.alpha_composite(housing)
 sheen = np.zeros((N, N, 4), np.uint8)
-sheen[int(y0 + 10 * K):int(y0 + 15 * K), int(x0 + 56 * K):int(x1 - 56 * K)] = (255, 255, 255, 30)
+sheen[int(y0 + 8 * K):int(y0 + 13 * K), int(x0 + 44 * K):int(x1 - 44 * K)] = (255, 255, 255, 32)
 img.alpha_composite(Image.fromarray(sheen, "RGBA"))
 
-color = (255, 52, 44) if rear else (236, 244, 255)
-cx, cy = N / 2, (y0 + y1) / 2
-outer, ring = 170 * K, 30 * K          # half-size of the frame, frame thickness
-core = 72 * K                           # half-size of the inner square
 lights = Image.new("RGBA", (N, N), (0, 0, 0, 0))
 ld = ImageDraw.Draw(lights)
-ld.rounded_rectangle([cx - outer, cy - outer, cx + outer, cy + outer], radius=22 * K, fill=(*color, 255))
-ld.rounded_rectangle([cx - outer + ring, cy - outer + ring, cx + outer - ring, cy + outer - ring],
-                     radius=10 * K, fill=(0, 0, 0, 0))
-ld.rounded_rectangle([cx - core, cy - core, cx + core, cy + core], radius=12 * K, fill=(*color, 255))
+dim = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+dd = ImageDraw.Draw(dim)
+if rear:
+    # Tail light: a block of square pixels lit in a stair-step pattern.
+    cols, rows, pitch, size = 5, 3, 112 * K, 88 * K
+    gx = N / 2 - cols * pitch / 2
+    gy = (y0 + y1) / 2 - rows * pitch / 2
+    for r in range(rows):
+        for c in range(cols):
+            px = gx + c * pitch + (pitch - size) / 2
+            py = gy + r * pitch + (pitch - size) / 2
+            box = [px, py, px + size, py + size]
+            if (c + r) % 2 == 0:
+                ld.rounded_rectangle(box, radius=12 * K, fill=(*lit.astype(int), 255))
+            else:
+                dd.rounded_rectangle(box, radius=12 * K, fill=(70, 14, 14, 255))
+else:
+    # Headlight: two U-shaped light guides, open at the top, like the car's lamp.
+    stroke, gap = 30 * K, 56 * K
+    width = (x1 - x0 - 2 * 60 * K - gap) / 2
+    top, bottom = y0 + 58 * K, y1 - 52 * K
+    for i in range(2):
+        left = x0 + 60 * K + i * (width + gap)
+        right = left + width
+        ld.rectangle([left, top, left + stroke, bottom], fill=(236, 244, 255, 255))
+        ld.rectangle([right - stroke, top, right, bottom], fill=(236, 244, 255, 255))
+        ld.rectangle([left, bottom - stroke, right, bottom], fill=(236, 244, 255, 255))
+img.alpha_composite(dim)
 glow_layer = Image.new("RGBA", (N, N), (0, 0, 0, 0))
 glow_layer.paste((*glow, 255), mask=lights.getchannel("A"))
-for radius in (90 * K, 34 * K, 10 * K):
+for radius in (80 * K, 30 * K, 10 * K):
     img.alpha_composite(glow_layer.filter(ImageFilter.GaussianBlur(radius)))
 img.alpha_composite(lights)
+if not rear:
+    # Silver light strip below the lamp.
+    strip = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    ImageDraw.Draw(strip).rounded_rectangle([x0 + 10 * K, y1 + 30 * K, x1 - 10 * K, y1 + 48 * K],
+                                            radius=9 * K, fill=(200, 206, 214, 220))
+    img.alpha_composite(strip)
 
 img.resize((S, S), Image.LANCZOS).convert("RGB").save(out)
 print("wrote", out)

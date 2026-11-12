@@ -137,7 +137,7 @@ struct ChargingProgress: View {
 }
 
 #Preview("Lock Screen", as: .content, using: ChargingActivityAttributes(
-    carName: "IONIQ 5", paintID: "cyber-gray", rangeUnit: "mi", accentRGB: [0.66, 0.52, 1.0])) {
+    carName: "IONIQ 5", paintID: "cyber-gray", rangeUnit: "mi", accentRGB: [0.514, 0.220, 0.925])) {
     ChargingLiveActivityWidget()
 } contentStates: {
     ChargingActivityAttributes.ContentState(phase: .charging, percent: 48, limit: 80, powerKW: 7.2, range: 151,

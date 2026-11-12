@@ -40,7 +40,7 @@ targets:
         INFOPLIST_KEY_NSSupportsLiveActivities: YES
         CODE_SIGN_ENTITLEMENTS: Ion.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Sketch AppIcon-Pastel AppIcon-Headlights AppIcon-Taillights AppIcon-Ion-Amber AppIcon-Ion-Orange AppIcon-Ion-Pink AppIcon-Ion-BlueViolet AppIcon-Ion-Azure
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Sketch AppIcon-Pastel AppIcon-Headlights AppIcon-Taillights AppIcon-Ion-Amber AppIcon-Ion-Orange AppIcon-Ion-Pink AppIcon-Ion-Azure
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
   IonWidget:
     type: app-extension

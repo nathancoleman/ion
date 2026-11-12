@@ -13,7 +13,7 @@ out = sys.argv[1]
 dark = "--dark" in sys.argv
 # --accent=R,G,B tints the whole icon (default: Ion violet).
 accent = next((tuple(int(v) for v in a.split("=", 1)[1].split(",")) for a in sys.argv if a.startswith("--accent=")),
-              (168, 112, 255))
+              (131, 56, 236))  # Blue Violet
 acc = np.array(accent, np.float32)
 def mix(c, other, t): return tuple(int(x) for x in (np.array(c, np.float32) * (1 - t) + np.array(other, np.float32) * t))
 S, K = 1024, 4
