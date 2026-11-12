@@ -1,0 +1,9 @@
+*.xcodeproj
+build/
+DerivedData/
+.DS_Store
+xcuserdata/
+
+# Car artwork is derived from studio photos that aren't ours to redistribute.
+# Regenerate locally with tools/ (see README); the app draws a fallback car without it.
+SharedResources/CarImages.xcassets/car-*.imageset/*.png

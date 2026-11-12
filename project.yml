@@ -1,0 +1,60 @@
+name: Ion
+options:
+  bundleIdPrefix: com.nathancoleman.ion
+  deploymentTarget:
+    iOS: "18.0"
+packages:
+  BetterBlueKit:
+    url: https://github.com/schmidtwmark/BetterBlueKit
+    revision: 015720bc771487ee12e2bd17d8fd2ee772ad41e3
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    # Nathan Coleman (Individual, paid Apple Developer Program).
+    DEVELOPMENT_TEAM: J3GLV5WWSZ
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+targets:
+  Ion:
+    type: application
+    platform: iOS
+    sources: [App, Shared, Resources, SharedResources]
+    dependencies:
+      - package: BetterBlueKit
+      - target: IonWidget
+    info:
+      path: App/Info.plist
+      properties:
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: [com.nathancoleman.ion.refresh]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nathancoleman.ion
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Ion
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_NSSupportsLiveActivities: YES
+        CODE_SIGN_ENTITLEMENTS: Ion.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Sketch AppIcon-Pastel AppIcon-Headlights AppIcon-Taillights AppIcon-Ion-Blue AppIcon-Ion-Teal AppIcon-Ion-Green AppIcon-Ion-Amber AppIcon-Ion-Red AppIcon-Ion-Pink
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
+  IonWidget:
+    type: app-extension
+    platform: iOS
+    sources: [Widget, Shared, SharedResources]
+    dependencies:
+      - package: BetterBlueKit
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Ion
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nathancoleman.ion.widget
+        CODE_SIGN_ENTITLEMENTS: Ion.entitlements
